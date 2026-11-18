@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block title %}Sign in | HardwareCare{% endblock %}
+{% block content %}
+<div class="login-layout">
+  <section class="login-copy">
+    <div class="eyebrow">HARDWARE SERVICE MANAGEMENT</div>
+    <h1>Every issue.<br><em>Clearly tracked.</em></h1>
+    <p>A single place for clients and service teams to follow problem status, rectification progress and verification.</p>
+    <div class="login-points"><span>✓ Transparent issue status</span><span>✓ Measurable rectification progress</span><span>✓ Client-ready reports</span></div>
+  </section>
+  <section class="login-card">
+    <div class="eyebrow">WELCOME BACK</div><h2>Sign in to your portal</h2><p class="muted">Use your company-provided account.</p>
+    <form method="post">
+      <label>Username<input name="username" required autocomplete="username" placeholder="Enter username"></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password" placeholder="Enter password"></label>
+      <button class="btn primary full">Sign in <span>→</span></button>
+    </form>
+    <div class="demo-credentials"><b>Demo accounts</b><br>Admin: <code>admin</code> / <code>Admin@123</code><br>Client: <code>client1</code> / <code>Client@123</code></div>
+  </section>
+</div>
+{% endblock %}

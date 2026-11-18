@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}{{ 'Edit' if issue else 'Add' }} problem | HardwareCare{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ISSUE REGISTER</div><h1>{{ 'Update problem' if issue else 'Create a problem' }}</h1><p class="muted">Keep the client-facing status and progress up to date.</p></div><a class="btn secondary" href="{{ url_for('dashboard') }}">← Back</a></div>
+<form method="post" class="panel form-panel">
+  <div class="form-section"><h3>Problem details</h3><div class="form-grid">
+    <label>Client / company *<input name="client_name" required value="{{ issue.client_name if issue else '' }}" placeholder="e.g. Acme Manufacturing"></label>
+    <label>Hardware / equipment *<input name="hardware" required value="{{ issue.hardware if issue else '' }}" placeholder="e.g. CNC Controller"></label>
+    <label class="span-2">Problem statement / title *<input name="title" required value="{{ issue.title if issue else '' }}" placeholder="Short description of the issue"></label>
+    <label class="span-2">Problem description *<textarea name="description" required rows="3" placeholder="Describe the reported problem">{{ issue.description if issue else '' }}</textarea></label>
+    <label class="span-2">Root cause<textarea name="root_cause" rows="2">{{ issue.root_cause if issue else '' }}</textarea></label>
+  </div></div>
+  <div class="form-section"><h3>Rectification and status</h3><div class="form-grid">
+    <label>Status<select name="status">{% for s in statuses %}<option {% if issue and issue.status==s %}selected{% elif not issue and s=='Open' %}selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+    <label>Rectification progress (%)<input type="number" name="progress" min="0" max="100" value="{{ issue.progress if issue else 0 }}" required></label>
+    <label class="span-2">Rectification action taken<textarea name="action_taken" rows="3">{{ issue.action_taken if issue else '' }}</textarea></label>
+    <label>Assigned engineer<input name="assigned_to" value="{{ issue.assigned_to if issue else '' }}"></label>
+    <label>Expected completion date<input type="date" name="target_date" value="{{ issue.target_date if issue else '' }}"></label>
+    <label>Verification / test result<input name="verification" value="{{ issue.verification if issue else '' }}" placeholder="e.g. Passed / Pending"></label>
+    <label>Client-facing remarks<input name="remarks" value="{{ issue.remarks if issue else '' }}"></label>
+  </div></div>
+  <div class="form-actions"><a class="btn secondary" href="{{ url_for('dashboard') }}">Cancel</a><button class="btn primary">Save problem</button></div>
+</form>
+{% endblock %}

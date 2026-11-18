@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Client accounts | HardwareCare{% endblock %}
+{% block content %}
+<div class="page-heading"><div><div class="eyebrow">ACCESS MANAGEMENT</div><h1>Client accounts</h1><p class="muted">Create sign-in accounts for client organisations.</p></div></div>
+<div class="two-col">
+<section class="panel form-panel"><h3>Create client login</h3><form method="post" class="stack-form">
+<label>Username<input name="username" required placeholder="e.g. acme_client"></label>
+<label>Client / company name<input name="client_name" required placeholder="Exact name used on issue records"></label>
+<label>Temporary password<input type="password" name="password" minlength="8" required placeholder="At least 8 characters"></label>
+<button class="btn primary">Create account</button></form><p class="hint">Share credentials securely with the client. Ask them to change the temporary password in your production deployment.</p></section>
+<section class="panel form-panel"><h3>Existing client accounts</h3>{% for u in users %}<div class="user-row"><div class="avatar">{{ u.username[:1]|upper }}</div><div><b>{{ u.username }}</b><small>{{ u.client_name }}</small></div><span class="status status-resolved">Client</span></div>{% else %}<p class="muted">No client accounts yet.</p>{% endfor %}</section>
+</div>
+{% endblock %}

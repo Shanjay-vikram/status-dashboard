@@ -1,0 +1,53 @@
+{% extends "base.html" %}{% block title %}Dashboard | HardwareCare{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><div class="eyebrow">{{ 'SERVICE OPERATIONS' if session.get('role')=='admin' else 'CLIENT OVERVIEW' }}</div>
+    <h1>Problem dashboard</h1><p class="muted">{{ session.get('client_name') or 'All client accounts' }} · Live issue register</p></div>
+  <div class="heading-actions"><button class="btn secondary" onclick="window.print()">↓ Export PDF</button>
+  {% if session.get('role')=='admin' %}<a class="btn primary" href="{{ url_for('new_issue') }}">＋ Add problem</a>{% endif %}</div>
+</div>
+<section class="metrics">
+  <article class="metric"><div class="metric-label">Total problems</div><div class="metric-value">{{ total }}</div><div class="metric-note">Issues recorded</div></article>
+  <article class="metric"><div class="metric-label">Resolved</div><div class="metric-value green">{{ resolved }}</div><div class="metric-note">Successfully closed</div></article>
+  <article class="metric"><div class="metric-label">In progress</div><div class="metric-value amber">{{ active }}</div><div class="metric-note">Being worked on / tested</div></article>
+  <article class="metric"><div class="metric-label">Open / on hold</div><div class="metric-value blue">{{ pending }}</div><div class="metric-note">Requires attention</div></article>
+</section>
+<section class="overview-grid">
+  <article class="panel progress-panel">
+    <div class="panel-head"><div><h3>Rectification progress</h3><p class="muted">Average completion across listed problems</p></div><span class="big-percent">{{ avg_progress }}%</span></div>
+    <div class="progress-track large"><div style="width:{{ avg_progress }}%"></div></div>
+    <div class="progress-foot"><span>Overall average progress</span><b>{{ avg_progress }}% complete</b></div>
+  </article>
+  <article class="panel chart-panel"><div class="panel-head"><div><h3>Issue status</h3><p class="muted">Distribution by current stage</p></div></div><div class="chart-wrap"><canvas id="statusChart"></canvas></div></article>
+</section>
+<section class="panel issue-panel">
+  <div class="panel-head table-head"><div><h3>Problem statements</h3><p class="muted">Select an issue to see full details and rectification history.</p></div>
+    <input id="searchBox" class="search" placeholder="Search problems…" oninput="filterIssues()"></div>
+  <div class="table-scroll"><table id="issueTable"><thead><tr><th>Issue ID</th><th>Problem statement</th><th>Hardware</th><th>Status</th><th>Progress</th><th>Target date</th><th></th></tr></thead><tbody>
+  {% for i in issues %}
+  <tr data-search="{{ (i.issue_key ~ ' ' ~ i.title ~ ' ' ~ i.hardware ~ ' ' ~ i.client_name)|lower }}">
+    <td><b class="issue-id">{{ i.issue_key }}</b><small>{{ i.client_name }}</small></td>
+    <td><b>{{ i.title }}</b><small>{{ i.description|truncate(72) }}</small></td>
+    <td>{{ i.hardware }}</td><td><span class="status status-{{ i.status|lower|replace(' ','-') }}">{{ i.status }}</span></td>
+    <td><div class="table-progress"><div class="progress-track"><div style="width:{{ i.progress }}%"></div></div><b>{{ i.progress }}%</b></div></td>
+    <td>{{ i.target_date or '—' }}</td><td class="actions"><a href="{{ url_for('issue_detail',issue_id=i.id) }}">View ↗</a>{% if session.get('role')=='admin' %}<a href="{{ url_for('edit_issue',issue_id=i.id) }}">Edit</a>{% endif %}</td>
+  </tr>
+  {% else %}<tr><td colspan="7" class="empty">No problems have been recorded yet.</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="table-footer">Showing {{ issues|length }} problem(s) <span>Last refreshed: {{ issues[0].updated_at if issues else '—' }}</span></div>
+</section>
+<script>
+const counts = {{ status_counts|tojson }};
+const labels = Object.keys(counts).filter(k => counts[k] > 0);
+const values = labels.map(k => counts[k]);
+new Chart(document.getElementById('statusChart'), {
+  type:'doughnut',
+  data:{labels, datasets:[{data:values, backgroundColor:['#64748b','#e7a83e','#4787d8','#8a70c9','#2e9d78','#bd7180'], borderWidth:0, hoverOffset:5}]},
+  options:{responsive:true, maintainAspectRatio:false, cutout:'70%', plugins:{legend:{position:'right', labels:{usePointStyle:true, boxWidth:7, padding:13, font:{size:11}}}}}
+});
+function filterIssues(){
+ const q=document.getElementById('searchBox').value.toLowerCase();
+ document.querySelectorAll('#issueTable tbody tr[data-search]').forEach(r=>r.style.display=r.dataset.search.includes(q)?'':'none');
+}
+</script>
+{% endblock %}
